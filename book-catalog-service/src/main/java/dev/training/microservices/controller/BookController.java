@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/books")
+@RequestMapping("/api/books")
 @RequiredArgsConstructor
 public class BookController {
 
@@ -34,7 +34,7 @@ public class BookController {
     private ResponseEntity<Void> createBook(@RequestBody Book newBookRequest, UriComponentsBuilder uriComponentsBuilder) {
         Book savedBook = bookService.save(newBookRequest);
         URI locationOfNewBook = uriComponentsBuilder
-                .path("books/{id}")
+                .path("/api/books/{id}")
                 .buildAndExpand(savedBook.getId())
                 .toUri();
         return ResponseEntity.created(locationOfNewBook).build();

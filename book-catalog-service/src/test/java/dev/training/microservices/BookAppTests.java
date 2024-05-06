@@ -26,7 +26,7 @@ class BookAppTests {
     @Test
     void Should_Return_A_Book_When_Data_Is_Saved() {
         ResponseEntity<String> response = restTemplate
-                .getForEntity("/books/1", String.class);
+                .getForEntity("/api/books/1", String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         DocumentContext documentContext = JsonPath.parse(response.getBody());
@@ -51,7 +51,7 @@ class BookAppTests {
     void Should_Create_A_New_Book() {
         Book newBook = new Book(null, "To Kill a Mockingbird", "Harper Lee", 12.50, 5);
         ResponseEntity<Void> createResponse = restTemplate
-                .postForEntity("/books", newBook, Void.class);
+                .postForEntity("/api/books", newBook, Void.class);
         assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
         URI locationOfBook = createResponse.getHeaders().getLocation();
@@ -79,7 +79,7 @@ class BookAppTests {
     @Test
     void Should_Return_A_Page_Of_Books() {
         ResponseEntity<String> response = restTemplate
-                .getForEntity("/books?page=0&size=3", String.class);
+                .getForEntity("/api/books?page=0&size=3", String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         DocumentContext documentContext = JsonPath.parse(response.getBody());
@@ -93,11 +93,11 @@ class BookAppTests {
         Book updatedBookInfo = new Book(null, null, "Nofal", null, 5);
         HttpEntity<Book> request = new HttpEntity<>(updatedBookInfo);
         ResponseEntity<Void> response = restTemplate
-                .exchange("/books/1", HttpMethod.PUT, request, Void.class);
+                .exchange("/api/books/1", HttpMethod.PUT, request, Void.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
         ResponseEntity<String> getResponse = restTemplate
-                .getForEntity("/books/1", String.class);
+                .getForEntity("/api/books/1", String.class);
         assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         DocumentContext documentContext = JsonPath.parse(getResponse.getBody());
@@ -121,12 +121,12 @@ class BookAppTests {
     @DirtiesContext
     void Should_Delete_A_Book() {
         ResponseEntity<Void> response = restTemplate
-                .exchange("/books/1",
+                .exchange("/api/books/1",
                         HttpMethod.DELETE, null, Void.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
         ResponseEntity<String> getResponse = restTemplate
-                .getForEntity("/books/1", String.class);
+                .getForEntity("/api/books/1", String.class);
         assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 }
