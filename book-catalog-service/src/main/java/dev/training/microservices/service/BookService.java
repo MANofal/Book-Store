@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 import java.util.Optional;
@@ -31,6 +32,7 @@ public class BookService {
         return bookRepository.existsById(id);
     }
 
+    @Transactional
     public boolean update(Integer id, Book updatedBookInfo) {
         return bookRepository.findById(id)
                 .map(existingBook -> {
@@ -41,6 +43,23 @@ public class BookService {
                 .orElse(false);
     }
 
+    @Transactional
+    public boolean orderBook(Integer id, Integer orderingQuantity) {
+        return bookRepository.findById(id)
+                .map(existingBook -> {
+                    int remainingQuantity = existingBook.getQuantity() - orderingQuantity;
+                    if (remainingQuantity < 0) {
+                        return false;
+                    }
+                    existingBook.setQuantity(remainingQuantity);
+                    bookRepository.save(existingBook);
+                    return true;
+                })
+                .orElse(false);
+    }
+
+
+    @Transactional
     public boolean delete(Integer id) {
         if (bookRepository.existsById(id)) {
             bookRepository.deleteById(id);

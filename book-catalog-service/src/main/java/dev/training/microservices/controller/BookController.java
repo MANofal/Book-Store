@@ -61,6 +61,15 @@ public class BookController {
         }
     }
 
+    @PutMapping("/{requestedId}/order/{quantity}")
+    private ResponseEntity<Void> orderBook(@PathVariable Integer requestedId, @PathVariable Integer quantity) {
+        if (bookService.orderBook(requestedId, quantity)) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
     @DeleteMapping("/{id}")
     private ResponseEntity<Void> deleteBook(@PathVariable Integer id) {
         if (bookService.delete(id)) {
