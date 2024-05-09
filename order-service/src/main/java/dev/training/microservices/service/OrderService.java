@@ -6,6 +6,9 @@ import dev.training.microservices.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -22,14 +25,27 @@ public class OrderService {
         return orderRepository.findById(id);
     }
 
+    private static final String CUSTOMER_BASE_URL = "http://localhost:9092/api/customers/";
+    private static final String BOOK_BASE_URL = "http://localhost:9091/api/books/";
+
     public Order createOrder(Order order) {
 
-//        Long customerId;
-//        Long bookId;
-//        Integer quantity;
+        ResponseEntity<Void> customerResponse = restTemplate
+                .getForEntity(CUSTOMER_BASE_URL + order.getCustomerId(), Void.class);
+        if (customerResponse.getStatusCode() != HttpStatus.OK) {
+            return null;
+        }
 
-        restTemplate
-                .getForEntity("/api/books/" + order.getBookId(), String.class);
+        ResponseEntity<Void> bookResponse = restTemplate.exchange(
+                BOOK_BASE_URL + order.getBookId() + "/order/" + order.getQuantity(),
+                HttpMethod.PUT,
+                null,
+                Void.class
+        );
+        if (bookResponse.getStatusCode() != HttpStatus.OK) {
+            return null;
+        }
+
         return orderRepository.save(order);
     }
 
