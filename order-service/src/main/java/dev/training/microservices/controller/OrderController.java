@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -33,10 +34,13 @@ public class OrderController {
 
     @PostMapping
     private ResponseEntity<Void> createOrder(@RequestBody Order newOrderRequest, UriComponentsBuilder uriComponentsBuilder) {
-        Order savedBook = orderService.createOrder(newOrderRequest);
+        Order savedOrder = orderService.createOrder(newOrderRequest);
+        if (savedOrder == null) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
         URI locationOfNewOrder = uriComponentsBuilder
                 .path("/api/orders/{id}")
-                .buildAndExpand(savedBook.getId())
+                .buildAndExpand(savedOrder.getId())
                 .toUri();
         return ResponseEntity.created(locationOfNewOrder).build();
     }

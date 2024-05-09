@@ -10,6 +10,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Optional;
@@ -18,15 +19,15 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class OrderService {
 
+    private static final String CUSTOMER_BASE_URL = "http://localhost:9092/api/customers/";
+    private static final String BOOK_BASE_URL = "http://localhost:9091/api/books/";
     private final OrderRepository orderRepository;
-    private final RestTemplate restTemplate;
+    private final RestTemplate restTemplate = new RestTemplate();
+
 
     public Optional<Order> findById(Integer id) {
         return orderRepository.findById(id);
     }
-
-    private static final String CUSTOMER_BASE_URL = "http://localhost:9092/api/customers/";
-    private static final String BOOK_BASE_URL = "http://localhost:9091/api/books/";
 
     public Order createOrder(Order order) {
 
@@ -36,13 +37,14 @@ public class OrderService {
             return null;
         }
 
-        ResponseEntity<Void> bookResponse = restTemplate.exchange(
-                BOOK_BASE_URL + order.getBookId() + "/order/" + order.getQuantity(),
-                HttpMethod.PUT,
-                null,
-                Void.class
-        );
-        if (bookResponse.getStatusCode() != HttpStatus.OK) {
+        try {
+            restTemplate.exchange(
+                    BOOK_BASE_URL + order.getBookId() + "/order/" + order.getQuantity(),
+                    HttpMethod.PUT,
+                    null,
+                    Void.class
+            );
+        } catch (HttpClientErrorException e) {
             return null;
         }
 
