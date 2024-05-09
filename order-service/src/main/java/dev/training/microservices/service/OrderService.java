@@ -19,11 +19,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class OrderService {
 
-    private static final String CUSTOMER_BASE_URL = "http://localhost:9092/api/customers/";
-    private static final String BOOK_BASE_URL = "http://localhost:9091/api/books/";
     private final OrderRepository orderRepository;
-    private final RestTemplate restTemplate = new RestTemplate();
-
+    private final BaseUrlService baseUrlService;
 
     public Optional<Order> findById(Integer id) {
         return orderRepository.findById(id);
@@ -31,15 +28,19 @@ public class OrderService {
 
     public Order createOrder(Order order) {
 
+        RestTemplate restTemplate = new RestTemplate();
+
         ResponseEntity<Void> customerResponse = restTemplate
-                .getForEntity(CUSTOMER_BASE_URL + order.getCustomerId(), Void.class);
+                .getForEntity(baseUrlService.createBaseUrlForService("customer-service")
+                        + "/api/customers/" + order.getCustomerId(), Void.class);
         if (customerResponse.getStatusCode() != HttpStatus.OK) {
             return null;
         }
 
         try {
             restTemplate.exchange(
-                    BOOK_BASE_URL + order.getBookId() + "/order/" + order.getQuantity(),
+                    baseUrlService.createBaseUrlForService("book-catalog-service")
+                            + "/api/books/" + order.getBookId() + "/order/" + order.getQuantity(),
                     HttpMethod.PUT,
                     null,
                     Void.class

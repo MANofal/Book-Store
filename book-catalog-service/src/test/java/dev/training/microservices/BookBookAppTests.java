@@ -19,7 +19,7 @@ import java.net.URI;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class BookAppTests {
+class BookBookAppTests {
     @Autowired
     TestRestTemplate restTemplate;
 

@@ -8,9 +8,9 @@ import org.springframework.context.annotation.Bean;
 import dev.training.microservices.model.Book;
 
 @SpringBootApplication
-public class App {
+public class BookApp {
     public static void main(String[] args) {
-        SpringApplication.run(App.class, args);
+        SpringApplication.run(BookApp.class, args);
     }
 
     @Bean
